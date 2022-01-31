@@ -1,6 +1,5 @@
 /cmdrbackend/.env
 .env
-/.vscode
 /cmdrbackend/node_modules
 /cmdrweb/node_modules
 /cmdrapp/node_modules
