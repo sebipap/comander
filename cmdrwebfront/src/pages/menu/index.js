@@ -18,7 +18,7 @@ export const Menu = () => {
   const [shoppingCart, setShoppingCart] = useState([]);
 
   useEffect(() => {
-    fetch("http://192.168.1.60:5000/api/menuItem/all")
+    fetch("http://localhost:5000/api/menuItem/all")
       .then((res) => res.json())
       .then((res) => setMenuItems(res));
   }, []);

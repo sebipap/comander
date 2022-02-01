@@ -44,6 +44,10 @@ const newMenuItem = async (req, res) => {
 
   try {
     const newMenuItem = await MenuItem.findOneAndUpdate(query, update, options);
+
+    await MenuItemVariant.remove({menuItem_id: newMenuItem._id})
+    await Extra.remove({menuItem_id: newMenuItem._id})
+
     variants.forEach((variant) => newMenuItemVariant(variant, newMenuItem._id));
     extras.forEach((extra) => newExtra(extra, newMenuItem._id));
     aditionalOptions.forEach((aditionalOption) => newAditionalOption(aditionalOption, newMenuItem._id));

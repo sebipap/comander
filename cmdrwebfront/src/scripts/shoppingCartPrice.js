@@ -1,5 +1,5 @@
 export const shoppingCartPrice = async (shoppingCart) => {
-  const response = await fetch("http://192.168.1.60:5000/api/course/shoppingCartPrice", {
+  const response = await fetch("http://localhost:5000/api/course/shoppingCartPrice", {
     method: "POST", 
     mode: "cors", 
     cache: "no-cache",
