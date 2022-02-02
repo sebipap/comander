@@ -240,7 +240,7 @@ export const PlateWindow = (props) => {
           <CloseButton onClick={props.close} />
 
           <VStack gap={10} >
-            <Image src={imgURL} style={{ borderRadius: 10, width: "100%" }} />
+            <Image src={`http://localhost:5000/images/${_id}${imgURL}`} style={{ borderRadius: 10, width: "100%" }} />
             <Stack spacing="5"  w="100%" p="5">
               <Heading size="lg">{name}</Heading>
 

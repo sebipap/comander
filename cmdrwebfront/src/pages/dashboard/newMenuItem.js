@@ -34,10 +34,14 @@ import {
   Th,
   Tbody,
   Td,
+  Image,
+  Tooltip,
+  useToast,
 } from "@chakra-ui/react";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { newMenuItem } from "../../scripts/newMenuItem";
+import { uploadImg } from "../../scripts/uploadImg";
 import { dietTagData, getDietData } from "../menu/dietTags";
 
 export const NewMenuItem = () => {
@@ -45,17 +49,16 @@ export const NewMenuItem = () => {
   const [tags, setTags] = useState(["vegan"]);
   const [variants, setVariants] = useState([]);
   const [extras, setExtras] = useState([]);
-  const [fieldsData, setFieldsData] = useState({
-    name: "",
-    category: "",
-    description: "",
-    imgURL: "",
-  });
+  const [imgFile, setImgFile] = useState(null);
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [imgURL, setImgURL] = useState("");
 
-  const handleFieldsChange = (event) => {
-    const { value, name } = event.target;
-    setFieldsData({ ...fieldsData, [name]: value });
-  };
+  const handleNameChange = (e) => setName(e.target.value);
+  const handleCategoryChange = (e) => setCategory(e.target.value);
+  const handleDescriptionChange = (e) => setDescription(e.target.value);
+  const handleImgURLChange = (e) => setImgURL(e.target.value);
 
   const addVariant = (variant) => setVariants(variants.concat(variant));
   const addExtra = (extra) => setExtras(extras.concat(extra));
@@ -65,10 +68,60 @@ export const NewMenuItem = () => {
   const removeExtra = (extraToDelete) =>
     setExtras(extras.filter((extra) => extra != extraToDelete));
 
-  const handleSubmit = async () => {
-    const itemObj = { ...fieldsData,
-			tags, variants, extras };
-    const response = await newMenuItem(itemObj);
+  const handleSubmit = () => {
+    const itemObj = {
+      name,
+      category,
+      description,
+      imgURL: imgFile.name ,
+      tags,
+      variants,
+      extras,
+    };
+     newMenuItem(itemObj)
+      .then((res) => { 
+        const {message, id} = res
+      
+    uploadImg(imgFile, id)
+      .then((res) =>
+        toast({
+          title: res.message,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        })
+      )
+      .catch((err) =>
+        toast({
+          title: err.message,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        })
+      );
+
+
+        toast({
+          title: message,
+          description: id,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        })
+      })
+      .catch((err) =>
+        toast({
+          title: err.message,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        })
+
+      
+        
+      );
+
+
   };
 
   const CreateChildren = ({ title, values, handleAdd, handleRemove }) => {
@@ -211,6 +264,19 @@ export const NewMenuItem = () => {
     );
   };
 
+  const fileUploader = useRef(null);
+  const toast = useToast();
+
+  const onImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      let reader = new FileReader();
+      reader.onload = (e) => setImgURL(e.target.result);
+      reader.readAsDataURL(event.target.files[0]);
+
+      setImgFile(event.target.files[0]);
+    }
+  };
+
   return (
     <>
       <Button
@@ -231,40 +297,60 @@ export const NewMenuItem = () => {
           <ModalCloseButton />
           <ModalBody>
             <VStack gap={10}>
-              <Button
-                style={{ borderRadius: 10, width: "100%", height: 100 }}
-                rightIcon={<AttachmentIcon />}
-              >
-                Elegir una imagen
-              </Button>
+              {imgURL ? (
+                <Tooltip label="Hace click en la foto para cambiarla">
+                  <Image
+                    style={{ borderRadius: 10, width: "100%" }}
+                    rightIcon={<AttachmentIcon />}
+                    onClick={() => fileUploader.current.click()}
+                    src={imgURL}
+                    alt={imgURL}
+                  />
+                </Tooltip>
+              ) : (
+                <Button
+                  style={{ borderRadius: 10, width: "100%", height: 100 }}
+                  rightIcon={<AttachmentIcon />}
+                  onClick={() => fileUploader.current.click()}
+                >
+                  Elegir una imagen
+                </Button>
+              )}
+
+              <input
+                type="file"
+                style={{ display: "none" }}
+                ref={fileUploader}
+                onChange={onImageChange}
+                accept="/image"
+              />
+
               <Stack spacing="5" w="100%" p="5">
                 <Input
-                  value={fieldsData.name}
-                  onChange={handleFieldsChange}
+                  value={name}
+                  onChange={handleNameChange}
                   placeholder="Nombre del Plato / Producto"
-		              name="name"
-									size="lg"
+                  name="name"
+                  size="lg"
                 />
                 <Input
-                  value={fieldsData.category}
-                  onChange={handleFieldsChange}
+                  value={category}
+                  onChange={handleCategoryChange}
                   placeholder="Categoría"
-		              name="category"
-								/>
+                  name="category"
+                />
                 <Textarea
-                  value={fieldsData.description}
-                  onChange={handleFieldsChange}
+                  value={description}
+                  onChange={handleDescriptionChange}
                   placeholder="Describe el Producto...	"
-		              name="description"
-								/>
+                  name="description"
+                />
                 <Input
-                  value={fieldsData.imgURL}
-                  onChange={handleFieldsChange}
+                  value={imgURL}
+                  onChange={handleImgURLChange}
                   placeholder="imgURL"
-		              name="imgURL"
-								/>
-
-                {JSON.stringify(fieldsData)}
+                  name="imgURL"
+                />
 
                 <CreateChildren
                   title="Variantes"

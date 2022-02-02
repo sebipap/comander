@@ -8,6 +8,9 @@ const { newExtra } = require("./extra");
 const { newMenuItemVariant } = require("./menuItemVariant");
 
 const newMenuItem = async (req, res) => {
+
+  console.log(req.body)
+
   let newToken = req.body.token;
   let newName = req.body.name;
 
@@ -45,31 +48,52 @@ const newMenuItem = async (req, res) => {
   try {
     const newMenuItem = await MenuItem.findOneAndUpdate(query, update, options);
 
-    await MenuItemVariant.remove({menuItem_id: newMenuItem._id})
-    await Extra.remove({menuItem_id: newMenuItem._id})
+    await MenuItemVariant.deleteOne({ menuItem_id: newMenuItem._id });
+    await Extra.deleteOne({ menuItem_id: newMenuItem._id });
 
-    variants.forEach((variant) => newMenuItemVariant(variant, newMenuItem._id));
-    extras.forEach((extra) => newExtra(extra, newMenuItem._id));
-    aditionalOptions.forEach((aditionalOption) => newAditionalOption(aditionalOption, newMenuItem._id));
+    if (variants && variants.length > 0) {
+      variants.forEach((variant) =>
+        newMenuItemVariant(variant, newMenuItem._id)
+      );
+    }
+    if (extras && extras.length > 0) {
+      extras.forEach((extra) => newExtra(extra, newMenuItem._id));
+    }
+    if (aditionalOptions && aditionalOptions.length > 0) {
+      aditionalOptions.forEach((aditionalOption) =>
+        newAditionalOption(aditionalOption, newMenuItem._id)
+      );
+    }
 
-    res.status(200).send(newMenuItem);
+    const successResponse = {
+      message: `Se ha subido con exito el ${newMenuItem.name}`,
+      id: newMenuItem._id,
+    };
+
+    console.log(successResponse);
+    res.status(200).send(successResponse);
   } catch (e) {
+    console.log(e);
     res.status(400).send(e);
   }
 };
 
 const getAllMenuItems = async (req, res) => {
   const allMenuItems = await MenuItem.find({});
-  const completeMenuItems = await Promise.all (allMenuItems.map(async (item) => await completeMenuItem(item._id)))
+  const completeMenuItems = await Promise.all(
+    allMenuItems.map(async (item) => await completeMenuItem(item._id))
+  );
   res.send(completeMenuItems);
 };
 
-const completeMenuItem = async(menuItem_id) => {
+const completeMenuItem = async (menuItem_id) => {
   const menuItem = await MenuItem.findById(menuItem_id);
 
   const variants = await MenuItemVariant.find({ menuItem_id: menuItem._id });
   const extras = await Extra.find({ menuItem_id: menuItem._id });
-  const aditionalOptions = await AditionalOption.find({ menuItem_id: menuItem._id });
+  const aditionalOptions = await AditionalOption.find({
+    menuItem_id: menuItem._id,
+  });
 
   const category = await Category.findById(menuItem.category_id);
 
@@ -97,17 +121,14 @@ const completeMenuItem = async(menuItem_id) => {
     extras,
     aditionalOptions,
   };
-}
+};
 
 const getAllMenuItemDataById = async (req, res) => {
-
   try {
     res.send(completeMenuItem(req.params.id));
   } catch (error) {
     res.status(400).send("No existe ese plato");
-
   }
-  
 };
 
 module.exports = { newMenuItem, getAllMenuItems, getAllMenuItemDataById };
