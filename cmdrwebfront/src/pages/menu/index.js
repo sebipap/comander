@@ -6,51 +6,54 @@ import {
   SimpleGrid,
   Text,
   useToast,
-  Image
+  Image,
+  List,
+  ListItem,
+  Flex,
+  HStack,
+  Grid,
+  GridItem,
+  Container,
+  Stack,
+  VStack,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { MenuNav } from "./menuNav";
-import { Plate } from "./plate";
+import { MenuItem } from "./menuItem";
+import { getAllMenuItems } from "../../scripts/GetAllMenuItems";
+import MenuSideBar from "./menuSideBar";
 
 export const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [shoppingCart, setShoppingCart] = useState([]);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/menuItem/all")
-      .then((res) => res.json())
-      .then((res) => setMenuItems(res));
-  }, []);
-
+  useEffect(() => getAllMenuItems().then((res) => setMenuItems(res)), []);
 
   const toast = useToast();
 
-
   const addToShoppingCart = (course) => {
-    setShoppingCart(
-      shoppingCart.concat(course)
-    );
+    setShoppingCart(shoppingCart.concat(course));
     toast({
       title: `Se ${
         course.amount > 1
           ? `han añadido al pedido ${course.amount}`
           : "ha añadido al pedido un"
       } ${course.menuItemName} `,
-      position:"top",
+      position: "top",
       duration: 3000,
-      status:"success",
-    })
-  
+      status: "success",
+    });
   };
 
   const remove = (course) => {
     setShoppingCart(shoppingCart.filter((aCourse) => aCourse != course));
   };
 
-  const clearShoppingCart = () => setShoppingCart([])
+  const clearShoppingCart = () => setShoppingCart([]);
 
-  const categoryNames = [...new Set(menuItems.map((item) => item.category.name))];
+  const categoryNames = [
+    ...new Set(menuItems.map((item) => item.category.name)),
+  ];
   const categories = categoryNames
     .map((name) => {
       return {
@@ -63,16 +66,15 @@ export const Menu = () => {
   const Category = (props) => {
     const { name, items } = props.category;
     return (
-      <Box m="5">
-        <Box m="5">
-          <Heading as="h3">{name}</Heading>
-        </Box>
+      <Stack spacing="10" mb="10">
+        <hr />
+        <Heading size="lg">{name}</Heading>
         <SimpleGrid columns={[1, 2, 3, 4]} spacing="40px">
           {items.map((item) => (
-            <Plate item={item} addToShoppingCart={addToShoppingCart} />
+            <MenuItem item={item} addToShoppingCart={addToShoppingCart} />
           ))}
         </SimpleGrid>
-      </Box>
+      </Stack>
     );
   };
 
@@ -80,10 +82,30 @@ export const Menu = () => {
 
   return (
     <>
-      <MenuNav shoppingCart={shoppingCart} remove={remove} clearShoppingCart={clearShoppingCart} />
-      <Box pt="10" bg="#ebebeb">
-        <Categories />
-      </Box>
+      <MenuNav
+        shoppingCart={shoppingCart}
+        remove={remove}
+        clearShoppingCart={clearShoppingCart}
+      />
+      <MenuSideBar>
+        <Box>
+          <Heading size="md" mb="5">
+            Categorías
+          </Heading>
+          <VStack>
+            {categories.map((cat) => (
+              
+
+                <Text w="100%"><a href="*">{cat.name}</a></Text>
+              
+            ))}
+          </VStack>
+        </Box>
+        <Box>
+          <Heading mb="5">Productos</Heading>
+          <Categories />
+        </Box>
+      </MenuSideBar>
     </>
   );
 };

@@ -1,34 +1,58 @@
 const Course = require("../models/Course");
+const Extra = require("../models/Extra");
+const MenuItemVariant = require("../models/MenuItemVariant");
 const Order = require("../models/Order");
-const { newCourse, shoppingCartPrice } = require("./course");
+const { newCourse, shoppingCartPrice, fullCourseData } = require("./course");
 
 const newOrderService = async (req, res) => {
-
-
   const orderReq = req.body;
   console.log(orderReq);
   const coursesReq = orderReq.courses;
-  const total = (await (shoppingCartPrice(coursesReq))).shoppingCartPrice
+  const total = (await shoppingCartPrice(coursesReq)).shoppingCartPrice;
   const order = new Order({
     timeDate: new Date(),
     deliveryLocation: orderReq.deliveryLocation,
     orderNote: orderReq.orderNote,
-    total 
+    total,
   });
 
   try {
     const savedOrder = await order.save();
     coursesReq.forEach((courseReq) => {
       newCourse(courseReq, savedOrder._id);
-      console.log(courseReq)
+      console.log(courseReq);
     });
-    res.status(201)
-    res.send({message: 'Orden Cargada por $' + savedOrder.total, id: savedOrder._id} );
+    res.status(201);
+    res.send({
+      message: "Orden Cargada por $" + savedOrder.total,
+      id: savedOrder._id,
+    });
   } catch (e) {
-    res.status(400).send({message: `error ${e}`});
+    res.status(400).send({ message: `error ${e}` });
   }
 };
 
 
+const orderCoursesService = async (req,res) => {
+  return res.send(await orderCourses(req.params.id))
+}
 
-module.exports = { newOrderService };
+const orderCourses = async (id) => {
+  try{
+    const courses = await Course.find({ order_id: id });
+    return await Promise.all(courses.map(async (course) => await fullCourseData(course)))
+    
+  }catch(err){ console.log("err" + err)}
+
+};
+
+const allOrdersService = async (req, res) => {
+  try {
+    const orders = await Order.find({});
+    return res.send(orders);
+  } catch (error) {
+    return res.send({ error });
+  }
+};
+
+module.exports = { newOrderService, allOrdersService, orderCoursesService };

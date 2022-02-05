@@ -40,6 +40,7 @@ import { makeOrder } from "../../scripts/makeOrder";
 import { shoppingCartPrice } from "../../scripts/shoppingCartPrice";
 import { CoursesGroup } from "./courseGroup";
 import { Redirect } from "react-router-dom";
+import { AddIcon } from "@chakra-ui/icons";
 
 export const ShoppingCartLine = (props) => {
   const [amount, setAmount] = useState("");
@@ -126,10 +127,10 @@ export const ShoppingCart = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [total, setTotal] = useState(0);
   const [redirect, setRedirect] = useState(null);
-  const [isConfirmed, setIsConfirmed] = useState(false)
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   let navigate = useNavigate();
-
 
   let params = useParams();
   const table = params.table;
@@ -145,6 +146,9 @@ export const ShoppingCart = (props) => {
       courses: props.shoppingCart,
       deliveryLocation: table,
     };
+
+
+    setLoading(true)
     makeOrder(order)
       .then((res) => res.json())
       .then((res) => {
@@ -154,9 +158,10 @@ export const ShoppingCart = (props) => {
           duration: 4000,
           status: "success",
         });
-        navigate(`../confirmation/${res.id}`)
-        props.clearShoppingCart()
-        onClose()
+        setLoading(false)
+        navigate(`../confirmation/${res.id}`);
+        props.clearShoppingCart();
+        onClose();
       })
       .catch((err) => {
         toast({
@@ -174,7 +179,12 @@ export const ShoppingCart = (props) => {
         Ver Pedido
       </Button>
 
-      {isConfirmed && <Box><Heading>Is Confirmed!!</Heading><Button>go</Button></Box>}
+      {isConfirmed && (
+        <Box>
+          <Heading>Is Confirmed!!</Heading>
+          <Button>go</Button>
+        </Box>
+      )}
 
       {isOpen && (
         <Modal onClose={onClose} size={"lg"} isOpen={isOpen}>
@@ -200,7 +210,7 @@ export const ShoppingCart = (props) => {
                   </Stat>
                 </HStack>
 
-                <SimpleGrid
+                <HStack
                   columns={[1, 2]}
                   position="sticky"
                   bottom="1vh"
@@ -212,11 +222,17 @@ export const ShoppingCart = (props) => {
 
                   <a href={redirect}>
                     {" "}
-                    <Button onClick={handleMakeOrder} colorScheme="green">
+                    <Button
+                      colorScheme="green"
+                      onClick={handleMakeOrder}
+                      isLoading={loading}
+                      rightIcon={<AddIcon />}
+                      loadingText="Enviando Pedido"
+                    >
                       Pedir
                     </Button>
                   </a>
-                </SimpleGrid>
+                </HStack>
               </Box>
             </ModalBody>
             <ModalFooter></ModalFooter>

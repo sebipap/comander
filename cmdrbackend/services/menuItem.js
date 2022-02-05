@@ -8,8 +8,31 @@ const { newExtra } = require("./extra");
 const { newMenuItemVariant } = require("./menuItemVariant");
 
 const newMenuItem = async (req, res) => {
+  let {
+    name,
+    token,
+    category,
+    description,
+    imgURL,
+    tags,
+    variants,
+    extras,
+    aditionalOptions,
+  } = req.body;
 
-  console.log(req.body)
+  if (!name && !token)
+    return res.status(500).send({ error: "Escriba el Nombre" });
+  if (!category) return res.status(500).send({ error: "Escriba la Categoría" });
+  if (!description) description = "";
+  if (!imgURL) imgURL = "";
+  if (!tags) tags = [];
+  if (!variants || !variants[0])
+    return res.status(500).send({ error: "Introduzca al Menos Una Variante" });
+  if (!extras) extras = [];
+  if (!aditionalOptions) aditionalOptions = [];
+
+  if (!variants[0].name) variants[0].name = "Por Defecto";
+  if (!variants[0].price) variants[0].name = 0;
 
   let newToken = req.body.token;
   let newName = req.body.name;
@@ -28,11 +51,9 @@ const newMenuItem = async (req, res) => {
     setDefaultsOnInsert: true,
   };
 
-  const { variants, extras, aditionalOptions } = req.body;
+  const categoryUpsert = { name: category };
 
-  const categoryUpsert = { name: req.body.category };
-
-  const category = await Category.findOneAndUpdate(
+  const categoryObj = await Category.findOneAndUpdate(
     categoryUpsert,
     categoryUpsert,
     options
@@ -42,14 +63,15 @@ const newMenuItem = async (req, res) => {
     ...req.body,
     token: newToken,
     name: newName,
-    category_id: category._id,
+    category_id: categoryObj._id,
   };
 
   try {
     const newMenuItem = await MenuItem.findOneAndUpdate(query, update, options);
 
-    await MenuItemVariant.deleteOne({ menuItem_id: newMenuItem._id });
-    await Extra.deleteOne({ menuItem_id: newMenuItem._id });
+    await MenuItemVariant.deleteMany({ menuItem_id: newMenuItem._id });
+    await Extra.deleteMany({ menuItem_id: newMenuItem._id });
+    await AditionalOption.deleteMany({ menuItem_id: newMenuItem._id });
 
     if (variants && variants.length > 0) {
       variants.forEach((variant) =>
@@ -131,4 +153,20 @@ const getAllMenuItemDataById = async (req, res) => {
   }
 };
 
-module.exports = { newMenuItem, getAllMenuItems, getAllMenuItemDataById };
+const deleteMenuItem = async (req, res) => {
+  try {
+    await MenuItem.deleteOne({ _id: req.params.id });
+    console.log({ message: "Se ha eliminado con exito" });
+    return res.send({ message: "Se ha eliminado con exito" });
+  } catch (error) {
+    console.log({ error });
+    return res.send(error);
+  }
+};
+
+module.exports = {
+  newMenuItem,
+  getAllMenuItems,
+  getAllMenuItemDataById,
+  deleteMenuItem,
+};

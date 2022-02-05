@@ -24,6 +24,7 @@ import {
   PopoverTrigger,
   Spacer,
   Stack,
+  Text,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -43,9 +44,13 @@ export const MenuNav = (props) => {
       <div>
         <Flex m="5">
           <Box p="2">
-            <Heading size="lg" letterSpacing={"tighter"}>
-              La Voluntad
-            </Heading>
+            <HStack p="2" spacing={5}>
+              <Heading fontSize={25} letterSpacing={"tighter"}>
+                La Voluntad
+              </Heading>
+
+              <Text fontSize={20}> |  Carta </Text>
+            </HStack>
           </Box>
 
           <Spacer />
@@ -60,12 +65,6 @@ export const MenuNav = (props) => {
             )}
           </Box>
         </Flex>
-
-        {/* <Box flex={1} align="right">
-          <Box ml={2} display={{ base: "inline-block", md: "none" }}>
-            <Menu isLazy id="navbar-menu"></Menu>
-          </Box>
-        </Box> */}
       </div>
     </Box>
   );

@@ -3,8 +3,7 @@ const AditionalOption = require("../models/AditionalOption");
 const newAditionalOption = async (aditionalOptionReq, menuItem_id) => {
   const aditionalOption = new AditionalOption({
     ...aditionalOptionReq,
-    menuItem_id: menuItem_id
-
+    menuItem_id: menuItem_id,
   });
   try {
     const savedAditionalOption = await aditionalOption.save();
@@ -14,7 +13,5 @@ const newAditionalOption = async (aditionalOptionReq, menuItem_id) => {
     console.log(e);
   }
 };
-
-
 
 module.exports = { newAditionalOption };

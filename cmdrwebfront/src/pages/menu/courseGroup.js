@@ -1,5 +1,6 @@
 import { Box, Heading, Image, Text } from "@chakra-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { MenuItemImage } from "./menuItemImage";
 
 const LastPlateIcon = (props) => (
   <PlateIcon
@@ -17,17 +18,18 @@ const PlateIcon = (props) => (
     key={props.courseIdAndIndex}
     display="inline"
   >
-    <Image
-      as={motion.img}
+    <MenuItemImage
+      item={props.plate}
       borderRadius="lg"
       boxSize="40px"
-      src={props.plate.imgURL}
       alt={props.plate.name}
       fit="cover"
       shadow="lg"
       display="inline"
       marginLeft="1"
     />
+
+
   </Box>
 );
 

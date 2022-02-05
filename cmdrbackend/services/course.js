@@ -5,7 +5,7 @@ const MenuItem = require("../models/MenuItem");
 const MenuItemVariant = require("../models/MenuItemVariant");
 
 const newCourse = async (courseReq, order_id) => {
-  const course = new Course({...courseReq, order_id});
+  const course = new Course({ ...courseReq, order_id });
   try {
     const savedCourse = await course.save();
 
@@ -20,7 +20,15 @@ const commandCoursesService = async (req, res) => {
   res.send(courses);
 };
 
-const fullCourseDataService = async (req, res) => {
+const fullCourseDataById = async (id) => {
+  const course = Course.findById(id)
+  return await fullCourseData(course)
+}
+
+const fullCourseData = async (course) => {
+
+  console.log("course", course)
+
   const {
     menuItemVariant_id,
     amount,
@@ -28,9 +36,10 @@ const fullCourseDataService = async (req, res) => {
     courseMoment,
     extras_ids,
     aditionalOptionsConfiguration,
-  } = req.body;
+  } = course;
 
   const variant = await MenuItemVariant.findById(menuItemVariant_id);
+  console.log("variant", variant)
   const menuItem = await MenuItem.findById(variant.menuItem_id);
   const extras = await Promise.all(
     extras_ids.map(async (id) => await Extra.findById(id))
@@ -43,7 +52,7 @@ const fullCourseDataService = async (req, res) => {
 
   const price = amount * (variant.price + extrasPrice);
 
-  res.send({
+  return ({
     amount,
     special,
     courseMoment,
@@ -54,6 +63,11 @@ const fullCourseDataService = async (req, res) => {
     extras,
     price,
   });
+};
+
+const fullCourseDataService = async (req, res) => {
+   
+  return res.send(await fullCourseData(req.body)) 
 };
 
 const coursePrice = async (course) => {
@@ -73,13 +87,14 @@ const coursePrice = async (course) => {
 };
 
 const shoppingCartPrice = async (shoppingCart) => {
-
   const coursesPrices = await Promise.all(
     shoppingCart.map(async (course) => (await coursePrice(course)).price)
   );
-  const finalShoppingCartPrice = coursesPrices.concat(0).reduce((tot, x) => tot + x);
+  const finalShoppingCartPrice = coursesPrices
+    .concat(0)
+    .reduce((tot, x) => tot + x);
 
-  return ({shoppingCartPrice: finalShoppingCartPrice})
+  return { shoppingCartPrice: finalShoppingCartPrice };
 };
 
 const coursePriceService = async (req, res) =>
@@ -94,5 +109,7 @@ module.exports = {
   coursePriceService,
   fullCourseDataService,
   shoppingCartPriceService,
-  shoppingCartPrice
+  shoppingCartPrice,
+  fullCourseDataById,
+  fullCourseData
 };
