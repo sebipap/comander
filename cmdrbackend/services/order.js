@@ -10,7 +10,7 @@ const newOrderService = async (req, res) => {
   const coursesReq = orderReq.courses;
   const total = (await shoppingCartPrice(coursesReq)).shoppingCartPrice;
   const order = new Order({
-    timeDate: new Date(),
+    requestTimeDate: new Date(),
     deliveryLocation: orderReq.deliveryLocation,
     orderNote: orderReq.orderNote,
     total,
@@ -32,18 +32,19 @@ const newOrderService = async (req, res) => {
   }
 };
 
-
-const orderCoursesService = async (req,res) => {
-  return res.send(await orderCourses(req.params.id))
-}
+const orderCoursesService = async (req, res) => {
+  return res.send(await orderCourses(req.params.id));
+};
 
 const orderCourses = async (id) => {
-  try{
+  try {
     const courses = await Course.find({ order_id: id });
-    return await Promise.all(courses.map(async (course) => await fullCourseData(course)))
-    
-  }catch(err){ console.log("err" + err)}
-
+    return await Promise.all(
+      courses.map(async (course) => await fullCourseData(course))
+    );
+  } catch (err) {
+    console.log("err" + err);
+  }
 };
 
 const allOrdersService = async (req, res) => {
@@ -55,4 +56,14 @@ const allOrdersService = async (req, res) => {
   }
 };
 
-module.exports = { newOrderService, allOrdersService, orderCoursesService };
+const changeStatusService = async (req, res) => {
+  const { id, newStatus } = req.body;
+  if (!id || !newStatus)
+    return res.status(500).send({ error: "Orden o estado incorrecto" });
+
+  await Order.updateOne({_id: id}, {status: newStatus, acceptTimeDate: Date.now()})
+
+  return res.send({message: `Cambiado el estado a ${newStatus}`})
+};
+
+module.exports = { newOrderService, allOrdersService, orderCoursesService, changeStatusService };

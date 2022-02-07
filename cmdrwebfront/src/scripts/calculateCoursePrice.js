@@ -1,5 +1,7 @@
+import { server } from "../config";
+
 export const calculateCoursePrice = async (course) => {
-  const response = await fetch("http://localhost:5000/api/course/price", {
+  const response = await fetch(server + "/api/course/price", {
     method: "POST", 
     mode: "cors", 
     cache: "no-cache",

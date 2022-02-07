@@ -1,5 +1,7 @@
+import { server } from "../config";
+
 export const newMenuItem = async (menuItem) => {
-  return fetch("http://localhost:5000/api/menuItem/new", {
+  return fetch(`${server}/api/menuItem/new`, {
     method: "POST",
     mode: "cors",
     cache: "no-cache",

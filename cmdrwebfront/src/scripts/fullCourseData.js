@@ -1,5 +1,7 @@
+import { server } from "../config";
+
 export const fullCourseData = async (course) => {
-  const response = await fetch("http://localhost:5000/api/course/fullData", {
+  const response = await fetch(server + "/api/course/fullData", {
     method: "POST", 
     mode: "cors", 
     cache: "no-cache",

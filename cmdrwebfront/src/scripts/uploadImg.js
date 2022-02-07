@@ -1,3 +1,5 @@
+import { server } from "../config";
+
 export const uploadImg = async (file, name) => {
   const formData = new FormData();
 
@@ -10,7 +12,7 @@ export const uploadImg = async (file, name) => {
     body: formData,
   };
 
-  return fetch("http://localhost:5000/api/image/upload", options)
+  return fetch(server + "/api/image/upload", options)
   .then(res => res.json())
 
 };

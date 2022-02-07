@@ -1,13 +1,22 @@
 const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
-  timeDate: {
-    type: String,
-    default: "unknown date",
+
+  requestTimeDate: {
+    type: Date,
+    default: Date.parse(0),
+  },
+  acceptTimeDate: {
+    type: Date,
+    default: Date.parse(0),
+  },
+  finishTimeDate: {
+    type: Date,
+    default: Date.parse(0),
   },
 
   deliveryLocation: {
     type: String,
-    default: "unknown table",
+    default: Date.parse(0),
   },
 
   status: {

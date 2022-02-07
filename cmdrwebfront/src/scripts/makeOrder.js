@@ -1,5 +1,7 @@
+import { server } from "../config";
+
 export const makeOrder = async (order) => {
-  const response = await fetch("http://localhost:5000/api/order/new", {
+  const response = await fetch(server + "/api/order/new", {
     method: "POST", 
     mode: "cors", 
     cache: "no-cache",

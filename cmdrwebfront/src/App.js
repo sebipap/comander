@@ -5,6 +5,7 @@ import { Menu } from "./pages/menu";
 import { ConfirmationPage } from "./pages/confirmationPage.js";
 import { EditMenuItems } from "./pages/dashboard/editMenuItems";
 import { Orders } from "./pages/dashboard/orders";
+import { Prices } from "./pages/dashboard/prices";
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
         <Route path="/dashboard/commands" element={<Commands />} />
         <Route path="/dashboard/orders" element={<Orders />} />
         <Route path="/dashboard/items" element={<EditMenuItems />} />
+        <Route path="/dashboard/prices" element={<Prices />} />
+
 
         <Route path="menu/:table" element={<Menu/>} />
         <Route path="*" element={"no existe esta pagina!"} />
