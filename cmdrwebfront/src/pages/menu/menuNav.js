@@ -1,36 +1,17 @@
 import {
-  Badge,
   Box,
-  Button,
+  Center,
   Container,
   Flex,
   Heading,
   HStack,
-  Menu,
-  MenuButton,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
+  SimpleGrid,
   Spacer,
   Stack,
   Text,
-  useColorModeValue,
-  useDisclosure,
 } from "@chakra-ui/react";
-import { ShoppingCart } from "./shoppingCart";
 
-export const MenuNav = (props) => {
+export const MenuNav = ({ children }) => {
   return (
     <Box
       position="sticky"
@@ -42,29 +23,29 @@ export const MenuNav = (props) => {
       zIndex={1}
     >
       <div>
-        <Flex m="5">
+        <SimpleGrid columns={[1, 2]}>
           <Box p="2">
             <HStack p="2" spacing={5}>
               <Heading fontSize={25} letterSpacing={"tighter"}>
                 La Voluntad
               </Heading>
 
-              <Text fontSize={20}> |  Carta </Text>
+              <Text fontSize={20}> | Carta </Text>
             </HStack>
           </Box>
-
-          <Spacer />
-
-          <Box p="2">
-            {props.shoppingCart.length > 0 && (
-              <ShoppingCart
-                shoppingCart={props.shoppingCart}
-                remove={props.remove}
-                clearShoppingCart={props.clearShoppingCart}
-              />
-            )}
+          <Box>
+            <Spacer />
+            <Box p={2}>
+              {children[0] ? (
+                <SimpleGrid columns={[1, 2]} maxW={"400px"} spacing="5">
+                  {children}{" "}
+                </SimpleGrid>
+              ) : (
+                <Center>{children}</Center>
+              )}
+            </Box>
           </Box>
-        </Flex>
+        </SimpleGrid>
       </div>
     </Box>
   );

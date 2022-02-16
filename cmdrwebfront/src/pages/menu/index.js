@@ -1,31 +1,38 @@
 import {
   Box,
-  Button,
   Heading,
-  position,
   SimpleGrid,
   Text,
   useToast,
-  Image,
-  List,
-  ListItem,
-  Flex,
-  HStack,
-  Grid,
-  GridItem,
-  Container,
   Stack,
   VStack,
+  Link,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { MenuNav } from "./menuNav";
 import { MenuItem } from "./menuItem";
 import { getAllMenuItems } from "../../scripts/GetAllMenuItems";
 import MenuSideBar from "./menuSideBar";
+import Scroll from "react-scroll";
+import { ShoppingCart } from "./shoppingCart";
+
+var scroller = Scroll.scroller;
 
 export const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [shoppingCart, setShoppingCart] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  useEffect(
+    () =>
+      scroller.scrollTo(selectedCategory, {
+        duration: 750,
+        delay: 0,
+        smooth: true,
+        offset: -120,
+
+      }),
+    [selectedCategory]
+  );
 
   useEffect(() => getAllMenuItems().then((res) => setMenuItems(res)), []);
 
@@ -40,7 +47,7 @@ export const Menu = () => {
           : "ha añadido al pedido un"
       } ${course.menuItemName} `,
       position: "top",
-      duration: 3000,
+      duration: 1000,
       status: "success",
     });
   };
@@ -68,7 +75,9 @@ export const Menu = () => {
     return (
       <Stack spacing="10" mb="10">
         <hr />
-        <Heading size="lg">{name}</Heading>
+        <Heading size="lg" id={name}>
+          {name}
+        </Heading>
         <SimpleGrid columns={[1, 2, 3, 4]} spacing="40px">
           {items.map((item) => (
             <MenuItem item={item} addToShoppingCart={addToShoppingCart} />
@@ -82,30 +91,45 @@ export const Menu = () => {
 
   return (
     <>
-      <MenuNav
-        shoppingCart={shoppingCart}
-        remove={remove}
-        clearShoppingCart={clearShoppingCart}
+      <MenuSideBar
+        ShoppingCart={() => (
+          <ShoppingCart
+            shoppingCart={shoppingCart}
+            remove={remove}
+            clearShoppingCart={clearShoppingCart}
+          />
+        )}
+        SideBarContents={() => (
+          <Box  w="100%">
+            <Text fontSize={25} mb="10" mt="3" fontWeight={"400"}>
+              Categorías
+            </Text>
+            <VStack m={2}>
+              {categories.map((cat) => (
+                <Link
+                  w="100%"
+                  fontSize={"lg"}
+                  fontWeight="500"
+                  p="2"
+                  rounded="lg"
+                  bgColor={selectedCategory == cat.name && "blue.700"}
+                  color={selectedCategory == cat.name && "white"}
+                  colorScheme="teal"
+                  onClick={() => setSelectedCategory(cat.name)}
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </VStack>
+          </Box>
+        )}
+        BodyContents={() => (
+          <Box>
+            <Heading mb="5">Productos</Heading>
+            <Categories />
+          </Box>
+        )}
       />
-      <MenuSideBar>
-        <Box>
-          <Heading size="md" mb="5">
-            Categorías
-          </Heading>
-          <VStack>
-            {categories.map((cat) => (
-              
-
-                <Text w="100%"><a href="*">{cat.name}</a></Text>
-              
-            ))}
-          </VStack>
-        </Box>
-        <Box>
-          <Heading mb="5">Productos</Heading>
-          <Categories />
-        </Box>
-      </MenuSideBar>
     </>
   );
 };

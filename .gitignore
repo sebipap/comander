@@ -1,6 +1,6 @@
 /cmdrbackend/.env
 .env
 /cmdrbackend/node_modules
-/cmdrweb/node_modules
 /cmdrapp/node_modules
-
+/cmdrfrontend/.env
+/cmdrfrontend/node_modules

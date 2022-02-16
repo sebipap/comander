@@ -30,6 +30,7 @@ import {
   Th,
   StatLabel,
   useToast,
+  Img,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -40,7 +41,7 @@ import { makeOrder } from "../../scripts/makeOrder";
 import { shoppingCartPrice } from "../../scripts/shoppingCartPrice";
 import { CoursesGroup } from "./courseGroup";
 import { Redirect } from "react-router-dom";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 
 export const ShoppingCartLine = (props) => {
   const [amount, setAmount] = useState("");
@@ -138,7 +139,7 @@ export const ShoppingCart = (props) => {
 
   useEffect(async () => {
     setTotal(await shoppingCartPrice(props.shoppingCart));
-    onOpen();
+    // if (props.shoppingCart.length > 0) onOpen();
   }, [props.shoppingCart]);
 
   const handleMakeOrder = async () => {
@@ -147,8 +148,7 @@ export const ShoppingCart = (props) => {
       deliveryLocation: table,
     };
 
-
-    setLoading(true)
+    setLoading(true);
     makeOrder(order)
       .then((res) => res.json())
       .then((res) => {
@@ -158,7 +158,7 @@ export const ShoppingCart = (props) => {
           duration: 4000,
           status: "success",
         });
-        setLoading(false)
+        setLoading(false);
         navigate(`../confirmation/${res.id}`);
         props.clearShoppingCart();
         onClose();
@@ -175,8 +175,14 @@ export const ShoppingCart = (props) => {
 
   return (
     <>
-      <Button key="lg" onClick={onOpen} colorScheme="green">
-        Ver Pedido
+      <Button
+        variant="solid"
+        colorScheme={"green"}
+        onClick={onOpen}
+        display={props.shoppingCart.length < 1 && "none"}
+        w="100%"
+      >
+        Ver Tu Pedido
       </Button>
 
       {isConfirmed && (

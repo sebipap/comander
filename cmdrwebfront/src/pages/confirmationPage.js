@@ -4,6 +4,7 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
+  Button,
   Center,
   Heading,
   HStack,
@@ -11,11 +12,26 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { server } from "../config";
 
 export const ConfirmationPage = () => {
   let params = useParams();
   const id = params.courseId;
+  const [status, setStatus] = useState("idle");
+
+  const isIdle = status == "idle";
+  const isPreparing = status == "preparing";
+  const isReady = status == "ready";
+
+  useEffect(() => {
+    setInterval(() => {
+      fetch(`${server}/api/order/status/${id}`)
+        .then((res) => res.json())
+        .then((res) => setStatus(res.status));
+    }, 2000);
+  }, []);
 
   return (
     <Box>
@@ -38,34 +54,72 @@ export const ConfirmationPage = () => {
       </Alert>
 
       <VStack w="100%" p={4}>
-        <Alert status="success">
-          <HStack>
-            <AlertIcon />
-            <Text>Pedido Procesado</Text>
-          </HStack>
-        </Alert>
+        {isIdle ? (
+          <Alert status="info">
+            <HStack>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="blue.500"
+                size="md"
+              />
+              <Text>Tu pedido se está procesando</Text>
+            </HStack>
+          </Alert>
+        ) : isPreparing ? (
+          <>
+            <Alert status="success">
+              <AlertIcon />
+              <Text>Tu pedido se procesó</Text>
+            </Alert>
 
-        <Alert status="info">
-          <HStack>
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="md"
-            />
-            <Text>Tu pedido se está cocinando</Text>
-          </HStack>
-        </Alert>
+            <Alert status="info">
+              <HStack>
+                <Spinner
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="blue.500"
+                  size="md"
+                />
+                <Text>Tu pedido se está cocinando</Text>
+              </HStack>
+            </Alert>
+          </>
+        ) : (
+          isReady && (
+            <>
 
-        <Alert status="info">
-          <HStack>
-            <AlertIcon />
-            <Text>Te avisaremos cuando tu pedido esté listo para entregar</Text>
-          </HStack>
-        </Alert>
+<Alert status="success">
+                <AlertIcon />
+                <Text>Tu pedido se procesó</Text>
+              </Alert>
+              <Alert status="success">
+                <AlertIcon />
+                <Text>Tu pedido se cocinó</Text>
+              </Alert>
 
+              <Alert status="info">
+                <HStack>
+                  <Spinner
+                    thickness="4px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color="blue.500"
+                    size="md"
+                  />
+                  <Text>Tu pedido se está listo para servir</Text>
+
+                </HStack>
+              </Alert>
+
+            </>
+          )
+        )}
       </VStack>
+      <a href="/menu/7">Hacer Otro Pedido</a>
+
     </Box>
   );
 };

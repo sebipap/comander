@@ -98,6 +98,13 @@ export const Order = ({ order }) => {
     setTimeToAccept(delaySeconds);
   };
 
+  const markAsReady = () => {
+    changeOrderStatus({ id: _id, newStatus: "ready" }).then((res) => {
+      console.log(JSON.stringify(res));
+    });
+    setTimeToAccept(delaySeconds);
+  };
+
   const rejectOrder = () => {
     changeOrderStatus({ id: _id, newStatus: "rejected" }).then((res) => {
       console.log(JSON.stringify(res));
@@ -210,7 +217,7 @@ export const Order = ({ order }) => {
             </Button>
             <Button
               rightIcon={<CheckIcon />}
-              onClick={acceptOrder}
+              onClick={markAsReady}
               colorScheme="green"
               variant={"ghost"}
             >

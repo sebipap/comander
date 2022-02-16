@@ -1,1 +1,2 @@
-export const server = "http://192.168.1.60:5000"
+
+export const server = process.env.REACT_APP_API_SERVER_URL

@@ -56,6 +56,22 @@ const allOrdersService = async (req, res) => {
   }
 };
 
+const getStatusService = async (req, res) => {
+  const id = req.params.id
+  if (!id)
+    return res.status(500).send({ error: "Orden o estado incorrecto" });
+
+  try{
+    const order = await Order.findById( id)
+
+    return res.send({status: order.status})
+  }catch{
+    return res.status(400).send({message: "that order dosnt exist"})
+  }
+
+
+}
+
 const changeStatusService = async (req, res) => {
   const { id, newStatus } = req.body;
   if (!id || !newStatus)
@@ -66,4 +82,4 @@ const changeStatusService = async (req, res) => {
   return res.send({message: `Cambiado el estado a ${newStatus}`})
 };
 
-module.exports = { newOrderService, allOrdersService, orderCoursesService, changeStatusService };
+module.exports = { newOrderService, allOrdersService, orderCoursesService, changeStatusService, getStatusService };
